@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <title>Ver lecturas</title>
+  </head>
+  <body>
+    <div>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="http://localhost/api">Sistema lectura</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura"
+              >Editor <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/ver"
+              >Ver lecturas <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/quiz"
+              >Examenes <span class="sr-only">(current)</span></a
+            >
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="container">
+      <h1>Lecturas disponibles</h1>
+      <button class="btn btn-primary" id="boton">Ver lecturas</button>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Nombre lectura</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="res"></tbody>
+        </table>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+      let item;
+      $("#boton").click(function (e) {
+        $.ajax({
+          method: "GET",
+          url: "api/index.php",
+          dataType: "json",
+          data: "action=lecturasDisponibles",
+          error: function () {
+            //Error
+          },
+          success: function (data) {
+            let res = document.querySelector("#res");
+            let i = 1;
+            res.innerHTML = "";
+            for (item of data) {
+              res.innerHTML += `
+         <tr>
+            <td width="33%">${i++}</td>
+            <td width="33%">${item.nombre}</td>
+            <td width="33%">
+            
+            <button class="btn btn-primary" id="botonLeer" onclick="
+            $.ajax({
+              method: 'GET',
+              url: 'api/index.php',
+              dataType:'json',
+              data: 'id=${item.id}',
+              error: function() {
+               //Error
+               },
+               success: function(data){
+                console.log(data);
+                console.log(${item.id})
+                window.location.href='/api/lectura/ver/escrito';
+               }
+            })">Leer</button>   <button class="btn btn-primary" id="botonCrearExamen" onclick="
+            $.ajax({
+              method: 'POST',
+              url: 'api/index.php',
+              dataType: 'json',
+              data: {
+                idQ: '${item.id}',
+                name: '${item.nombre}'
+              },
+               success: function(data){
+                console.log(data)
+                window.location.href='/api/lectura/ver/crearquiz';
+               },
+               error: function(error) {
+               console.log(error);
+               }
+            })
+            
+            ">Crear examen</button>
+            <button class="btn btn-danger" id="botonBorrar" onclick="
+            $.ajax({
+              method: 'POST',
+              url: 'api/index.php',
+              dataType: 'json',
+              data: {
+                idDel: '${item.id}',
+                delete: 'borrar'
+              },
+               success: function(data){
+                alert(data);
+                window.location.href='/api/lectura/ver';
+               },
+               error: function(error) {
+               console.log(error);
+               }
+            })
+            
+            ">Borrar lectura</button>
+
+
+            </td>
+
+         </tr>
+        `;
+            }
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

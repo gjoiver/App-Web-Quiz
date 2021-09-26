@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <title>Responder examen</title>
+  </head>
+  <body>
+    <div>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="http://localhost/api">Sistema lectura</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura"
+              >Editor <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/ver"
+              >Ver lecturas <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/quiz"
+              >Examenes <span class="sr-only">(current)</span></a
+            >
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="container">
+      <div id="cuestionario">
+        <h1 id="nombreQuiz"></h1>
+        <br>
+        <h2 id="nombrePregunta"></h2>
+        <br>
+        <form >
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+              <input type="radio" name="opciones" value="1" aria-label="Radio button for following text input">
+              </div>
+            </div>
+            <label id="opcion_1"></label>
+          </div>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+              <input type="radio" name="opciones" value="2" aria-label="Radio button for following text input">
+              </div>
+            </div>
+            <label id="opcion_2"></label>
+          </div>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+              <input type="radio" name="opciones" value="3" aria-label="Radio button for following text input">
+              </div>
+            </div>
+            <label id="opcion_3"></label>
+          </div>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+              <input type="radio" name="opciones" value="4" aria-label="Radio button for following text input">
+              </div>
+            </div>
+            <label id="opcion_4"></label>
+          </div>
+        </form>
+          </div>
+          <br>
+          <button type="button" id="responder" class="btn btn-primary">
+            Guardar respuesta
+          </button>
+      </div>
+      
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+      let item;
+      let item2;
+      let itemOptions;
+      let opcionCorrecta;
+      let respuestas=[];
+      let puntaje=0;
+      let correctas=0;
+      let totalPreguntas=0;
+      let num = 0;
+      let nombreQuiz=document.getElementById('nombreQuiz');
+      let nombrePregunta=document.getElementById('nombrePregunta');
+      let opcion1 = document.getElementById('opcion_1')
+      let opcion2 = document.getElementById('opcion_2')
+      let opcion3 = document.getElementById('opcion_3')
+      let opcion4 = document.getElementById('opcion_4')
+
+      //funciones para guardar datos de ajax en variables globales
+      function getValues(values) {
+        item2 = values;
+      }
+      function getOptions(options) {
+        itemOptions = options;
+      }
+      function getCorrect(answer){
+       opcionCorrecta=answer;
+      }
+      function agregarRespuesta(res){
+         respuestas.push(res);
+      }
+      function total(numeroDePreguntas){
+        totalPreguntas=numeroDePreguntas;
+      }
+      function calcularResultado(totalP,respondidasCorrectamente){
+            puntaje=(respondidasCorrectamente*100)/totalP;
+      }
+      function totalCorrectas(){
+           correctas++;
+      }
+      function contador() {
+        num++;
+      }
+      var correct=function(resCorrecta){
+          var __resCorrecta=resCorrecta || 0;
+          this.setResrCorrecta=function(newResCorrecta){
+            if(newResCorrecta){
+              __resCorrecta=newResCorrecta;
+            }
+          }
+          this.getResCorrecta=function(){
+            return __resCorrecta;
+          }
+      }
+      function comprobarRespuesta(opcion){
+        if(opcion==opcionCorrecta[0].answer){
+          totalCorrectas();
+          console.log(opcion)
+          console.log(opcionCorrecta[0].answer)
+          console.log('Correcto')
+        }else{
+          console.log(opcion)
+          console.log(opcionCorrecta[0].answer)
+          console.log('Incorrecto')
+        }
+      }
+      function AjaxOpciones() {
+        $.ajax({
+          method: "GET",
+          url: "api/index.php",
+          dataType: "json",
+          async: false,
+          data: "obtener_options=" + item2[num].id_pregunta,
+          success: function (data3) {
+            getOptions(data3);
+            AjaxGuardarOpcionCorrecta();
+          },
+          error: function (error3) {
+            console.log("error3");
+            console.log(error3);
+          },
+        });
+      }
+      //Peticiones ajax
+      $.ajax({
+        method: "GET",
+        url: "api/index.php",
+        dataType: "json",
+        async: false,
+        data: "obtener_quiz_id=true",
+        success: function (data) {
+          item = data;
+          $.ajax({
+            method: "GET",
+            url: "api/index.php",
+            dataType: "json",
+            async: false,
+            data: "obtener_quiz=" + item.IDRESQUIZ,
+            success: function (data2) {
+              getValues(data2);
+              total(data2.length);
+              AjaxOpciones();
+            },
+            error: function (error2) {
+              console.log(error2);
+            },
+          });
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+
+      function AjaxGuardarOpcionCorrecta(){
+        $.ajax({
+          method: "GET",
+          url: "api/index.php",
+          dataType: "json",
+          async: false,
+          data: "obtener_res=" + item2[num].id_pregunta,
+          success: function (data4) {
+            getCorrect(data4);
+          },
+          error: function (error4) {
+            console.log("error4");
+            console.log(error4);
+          },
+        });
+      }
+      function GuardarResultado(){
+        $.ajax({
+          method: "POST",
+          url: "api/index.php",
+          async: false,
+          data:{
+           puntajeTotal: puntaje
+          } ,
+          success: function (data4) {
+            alert('Preguntas guardadas exitosamente');
+          },
+          error: function (error4) {
+            console.log("error4");
+            console.log(error4);
+          },
+        });
+      }
+
+      $("#responder").click(function (e) {
+        let opcionElegida=$('input:radio[name=opciones]:checked').val();
+        agregarRespuesta(opcionElegida);
+        comprobarRespuesta(opcionElegida);
+        contador();
+        if (num >= item2.length) {
+          console.log(totalPreguntas);
+          calcularResultado(totalPreguntas,correctas);
+          console.log(puntaje)
+          GuardarResultado();
+          window.location.href='/api/lectura/quiz/resultado';
+        }
+        console.log(opcionCorrecta)
+        AjaxOpciones();
+        nombrePregunta.innerHTML=`${item2[num].qns}`;
+        opcion1.innerHTML=` ${itemOptions[0].choice}`;
+        opcion2.innerHTML=` ${itemOptions[1].choice}`;
+        opcion3.innerHTML=` ${itemOptions[2].choice}`;
+        opcion4.innerHTML=` ${itemOptions[3].choice}`;
+
+      });
+      nombreQuiz.innerHTML=`${item.QUIZTITLE}`;
+      nombrePregunta.innerHTML=`${item2[num].qns}`;
+      opcion1.innerHTML=` ${itemOptions[0].choice}`;
+      opcion2.innerHTML=` ${itemOptions[1].choice}`;
+      opcion3.innerHTML=` ${itemOptions[2].choice}`;
+      opcion4.innerHTML=` ${itemOptions[3].choice}`;
+
+    </script>
+  </body>
+</html>

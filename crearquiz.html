@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <title>Crear quiz</title>
+  </head>
+  <body>
+    <div>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="http://localhost/api">Sistema lectura</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura"
+              >Editor <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/ver"
+              >Ver lecturas <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/quiz"
+              >Examenes <span class="sr-only">(current)</span></a
+            >
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="container">
+      <h1>Crear Quiz</h1>
+      <br />
+
+      <h2>Escribir pregunta</h2>
+      <input type="text" class="form-control" id="question" />
+      <br />
+      <h2>Ingresas opciones</h2>
+      <h5>De las siguientes opciones seleccione cual será la correcta</h5>
+      <form id="formulario">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <input
+                type="radio"
+                name="opcion"
+                value="1"
+                aria-label="Radio button for following text input"
+              />
+            </div>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            id="option1"
+            aria-label="Text input with radio button"
+          />
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <input
+                type="radio"
+                name="opcion"
+                value="2"
+                aria-label="Radio button for following text input"
+              />
+            </div>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            id="option2"
+            aria-label="Text input with radio button"
+          />
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <input
+                type="radio"
+                name="opcion"
+                value="3"
+                aria-label="Radio button for following text input"
+              />
+            </div>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            id="option3"
+            aria-label="Text input with radio button"
+          />
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <input
+                type="radio"
+                name="opcion"
+                value="4"
+                aria-label="Radio button for following text input"
+              />
+            </div>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            id="option4"
+            aria-label="Text input with radio button"
+          />
+        </div>
+      </form>
+      <br />
+      <div id="send"></div>
+      <button id="save" type="button" class="btn btn-primary">
+        Crear pregunta
+      </button>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+      $("#save").click(function (e) {
+        let idQuiz;
+        let idPregunta;
+        let question = document.getElementById("question").value;
+        let option1 = document.getElementById("option1").value;
+        let option2 = document.getElementById("option2").value;
+        let option3 = document.getElementById("option3").value;
+        let option4 = document.getElementById("option4").value;
+        let opcionCorrecta = $("input:radio[name=opcion]:checked").val();
+        let SendLecture = document.querySelector("#send");
+        if (
+          question.length == 0 ||
+          option1.length == 0 ||
+          option2.length == 0 ||
+          option3.length == 0 ||
+          option4.length == 0
+        ) {
+          SendLecture.innerHTML = `
+    <div class="alert alert-warning">Por favor llene todo los campos</div>
+         `;
+          return;
+        }
+        return new Promise(function (resolve, reject) {
+          $.ajax({
+            method: "GET",
+            url: "api/index.php",
+            dataType: "json",
+            data: "crearquiz=crear",
+            success: function (data1) {
+              console.log(data1);
+              idQuiz = data1[0].id;
+              console.log(idQuiz);
+              return data1;
+            },
+            error: function (error) {
+              console.log("error1");
+              console.log(error);
+            },
+          }).then(function (datos) {
+            console.log(datos);
+            $.ajax({
+              method: "POST",
+              url: "php/index.php",
+              data: {
+                idQE: idQuiz,
+                nameLE: question,
+              },
+              success: function (data2) {
+                console.log("Pregunta guardada");
+              },
+              error: function (error2) {
+                console.log("error2");
+                console.log(error2);
+              },
+            }).then(function () {
+              $.ajax({
+                method: "GET",
+                url: "php/index.php",
+                dataType: "json",
+                data: "obtener_id_pregunta=preguntar",
+                success: function (data3) {
+                  console.log(data3);
+                  idPregunta = data3[0].id_pregunta;
+                },
+                error: function (error3) {
+                  console.log("error3");
+                  console.log(error3);
+                },
+              }).then(function () {
+                $.ajax({
+                  method: "POST",
+                  url: "api/index.php",
+                  data: {
+                    op1: option1,
+                    op2: option2,
+                    op3: option3,
+                    op4: option4,
+                    id_pregunta: idPregunta,
+                    p_correcta: opcionCorrecta,
+                  },
+                  success: function (data3) {
+                    question = "";
+                    option1 = "";
+                    option2 = "";
+                    option3 = "";
+                    option4 = "";
+                    SendLecture.innerHTML = `
+ <div class="alert alert-success">¡Pregunta guardada exitosamente!</div>
+    `;
+                  },
+                  error: function (error4) {
+                    console.log("error4");
+                    console.log(error4);
+                    SendLecture.innerHTML = `
+ <div class="alert alert-danger">No se han podido guardar las preguntas</div>
+ `;
+                  },
+                });
+              });
+            });
+          });
+        }).catch(function (errorcatch) {
+          console.log(errorcatch);
+        });
+      });
+    </script>
+  </body>
+</html>

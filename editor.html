@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <title>Crear lecturas</title>
+    <script src="https://cdn.ckeditor.com/4.15.1/full/ckeditor.js"></script>
+  </head>
+  <body>
+    <div>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="http://localhost/api">Sistema lectura</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura"
+              >Editor <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/ver"
+              >Ver lecturas <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/quiz"
+              >Examenes <span class="sr-only">(current)</span></a
+            >
+          </div>
+        </div>
+      </nav>
+    </div>
+    <br>
+    <div class="container">
+      <h1>Subir lectura</h1>
+      <br />
+      <h2>Titulo de la lectura</h2>
+
+      <input
+        type="text"
+        name="nameLecture"
+        class="form-control"
+        id="nameLecture"
+      />
+      <br />
+      <textarea name="editor1"> </textarea>
+      <div id="send"></div>
+      <button
+        href="api/lectura"
+        id="save"
+        type="button"
+        class="btn btn-primary"
+      >
+        Crear lectura
+      </button>
+
+      <script>
+        CKEDITOR.replace("editor1");
+      </script>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      $("#save").click(function (e) {
+        var nameLect = document.getElementById("nameLecture").value;
+        let data = CKEDITOR.instances.editor1.getData();
+        let SendLecture = document.querySelector("#send");
+
+        function validateCKEDITORforBlank(ckData) {
+          ckData = ckData.replace(/<[^>]*>|\s/g, "");
+          var vArray = new Array();
+          vArray = ckData.split("&nbsp;");
+          var vFlag = 0;
+          for (var i = 0; i < vArray.length; i++) {
+            if (vArray[i] == "" || vArray[i] == "") {
+              continue;
+            } else {
+              vFlag = 1;
+              break;
+            }
+          }
+          if (vFlag == 0) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+        let resul = validateCKEDITORforBlank(data);
+        if (nameLect.length == 0 || resul == true) {
+          SendLecture.innerHTML = `
+    <div class="alert alert-warning">Por favor llene los campos</div>
+    `;
+          return;
+        }
+        console.log(nameLect);
+        console.log(data);
+        $.ajax({
+          method: "POST",
+          url: "php/index.php",
+          dataType: "json",
+          data: {
+            name: nameLect,
+            editor: data,
+            send: 1,
+          },
+          success: function (data) {
+            SendLecture.innerHTML = `
+    <div class="alert alert-success">${data}</div>
+    `;
+          },
+          error: function (error) {
+            console.log(error);
+            SendLecture.innerHTML = `
+    <div class="alert alert-danger">!Ha ocurrido un error!</div>
+    `;
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

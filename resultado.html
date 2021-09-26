@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <title>Resultados</title>
+  </head>
+  <body>
+    <div>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="http://localhost/api">Sistema lectura</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura"
+              >Editor <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/ver"
+              >Ver lecturas <span class="sr-only">(current)</span></a
+            >
+            <a
+              class="nav-item nav-link active"
+              href="http://localhost/api/lectura/quiz"
+              >Examenes <span class="sr-only">(current)</span></a
+            >
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="container d-flex align-items-center flex-column">
+      <h1 class="p-2">Puntaje obtenido:</h1>
+      <h2 class="p-2 display-1" id="mostrar" ></h2>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+        
+      function MostrarResultado() {
+        let mostrar = document.getElementById("mostrar");
+        $.ajax({
+          method: "GET",
+          url: "api/index.php",
+          dataType: "json",
+          async: false,
+          data: "resultado=obtener",
+          success: function (data4) {
+
+            mostrar.innerHTML = `${data4}`;
+          },
+          error: function (error4) {
+            console.log("error4");
+            console.log(error4);
+          },
+        });
+      }
+      MostrarResultado();
+    </script>
+  </body>
+</html>
